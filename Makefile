@@ -87,10 +87,15 @@ QEMU_RUN_BIN				?= qemu-system-aarch64
 QEMU_IMAGE_BIN				?= qemu-img
 QEMU_NBD_BIN				?= qemu-nbd
 
+QEMU_GIC_VER				?= 3
+
+QEMU_MACHINE_TYPE			?= virt,gic-version=$(QEMU_GIC_VER),virtualization=on,iommu=smmuv3
+
 QEMU_CPU_TYPE				?= cortex-a72
 QEMU_CPU_NUM				?= 2
+
 QEMU_MEM_SIZE				?= 2G
-QEMU_GIC_VER				?= 3
+
 QEMU_UART_NUM				?= 0
 
 
@@ -223,7 +228,7 @@ $(eval $(call rule_inc,$(EMU_ROOT_PATH)/virt/Image.mk))
 # Emulator Qemu Arguments
 
 QEMU_RUN_ARGS				:= \
-	-M virt,gic-version=$(QEMU_GIC_VER),virtualization=on,iommu=smmuv3 \
+	-M $(QEMU_MACHINE_TYPE) \
 	-cpu $(QEMU_CPU_TYPE) \
 	-smp $(QEMU_CPU_NUM) \
 	-m $(QEMU_MEM_SIZE)
@@ -235,6 +240,8 @@ QEMU_BOOT_BIN				?= $(IMAGE_BOOT_BIN)
 QEMU_PRE_RUN				+= $(IMAGE_PRE_RUN)
 QEMU_RUN_ARGS				+= $(IMAGE_RUN_ARGS)
 QEMU_POST_RUN				+= $(IMAGE_POST_RUN)
+
+QEMU_RUN_ARGS				+= $(QEMU_RUN_EXTRAS)
 
 
 # Terminal Arguments
@@ -251,6 +258,16 @@ $(eval $(call rule_inc,$(EMU_ROOT_PATH)/qemu/Network.mk))
 
 # Develop Arguments
 $(eval $(call rule_inc,$(EMU_ROOT_PATH)/qemu/Develop.mk))
+
+
+QEMU_RUN_ARGS 				+= -name "KyberBench"
+
+QEMU_RUN_ARGS 				+= -usb
+QEMU_RUN_ARGS 				+= -device qemu-xhci
+#QEMU_RUN_ARGS 				+= -device usb-host,hostbus=1,hostaddr=1
+QEMU_RUN_ARGS 				+= -device usb-mouse
+QEMU_RUN_ARGS 				+= -device usb-kbd
+QEMU_RUN_ARGS 				+= -device usb-tablet
 
 
 # Qemu Running Command
