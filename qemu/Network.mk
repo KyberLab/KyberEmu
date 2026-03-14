@@ -17,11 +17,17 @@ ifeq ($(QEMU_NETWORK_TYPE),mmio)
 
 QEMU_NETWORK_DEVICE	:= virtio-net-device
 
+QEMU_RUN_ARGS		+= \
+	-device $(QEMU_NETWORK_DEVICE),netdev=tap0,mac=$(QEMU_TAP_MAC),bus=virtio-mmio-bus.2
+
 else
 
 ifeq ($(QEMU_NETWORK_TYPE),pcie)
 
 QEMU_NETWORK_DEVICE	:= virtio-net-pci,vectors=32,mq=on
+
+QEMU_RUN_ARGS		+= \
+	-device $(QEMU_NETWORK_DEVICE),netdev=tap0,mac=$(QEMU_TAP_MAC) \
 
 else
 
@@ -33,7 +39,6 @@ endif # ($(QEMU_NETWORK_TYPE),mmio)
 
 
 QEMU_RUN_ARGS		+= \
-	-device $(QEMU_NETWORK_DEVICE),netdev=tap0,mac=$(QEMU_TAP_MAC),bus=virtio-mmio-bus.2 \
 	-netdev tap,ifname=$(QEMU_TAP_NAME),id=tap0,script=$(QEMU_TAP_UP),downscript=$(QEMU_TAP_DOWN)
 
 
