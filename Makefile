@@ -237,12 +237,10 @@ QEMU_RUN_ARGS				:= \
 
 
 QEMU_BOOT_BIN				?= $(IMAGE_BOOT_BIN)
-QEMU_PRE_RUN				+= $(IMAGE_PRE_RUN)
-QEMU_RUN_ARGS				+= $(IMAGE_RUN_ARGS)
-QEMU_POST_RUN				+= $(IMAGE_POST_RUN)
 
-QEMU_RUN_ARGS				+= $(QEMU_RUN_EXTRAS)
 
+
+###############################################################################
 
 # Terminal Arguments
 $(eval $(call rule_inc,$(EMU_ROOT_PATH)/qemu/Terminal.mk))
@@ -260,6 +258,10 @@ $(eval $(call rule_inc,$(EMU_ROOT_PATH)/qemu/Network.mk))
 $(eval $(call rule_inc,$(EMU_ROOT_PATH)/qemu/Develop.mk))
 
 
+
+###############################################################################
+# Miscellaneous Arguments
+
 QEMU_RUN_ARGS 				+= -name "KyberBench"
 
 QEMU_RUN_ARGS 				+= -usb
@@ -270,17 +272,30 @@ QEMU_RUN_ARGS 				+= -device usb-kbd
 QEMU_RUN_ARGS 				+= -device usb-tablet
 
 
+
+###############################################################################
+# Image Emulator Arguments
+
+QEMU_PRE_RUN				+= $(IMAGE_PRE_RUN)
+QEMU_RUN_ARGS				+= $(IMAGE_RUN_ARGS)
+QEMU_POST_RUN				+= $(IMAGE_POST_RUN)
+
+QEMU_RUN_ARGS				+= $(QEMU_RUN_EXTRAS)
+
+QEMU_RUN_DEPENDS			+= $(QEMU_TERMINAL)
+QEMU_RUN_DEPENDS			+= $(QEMU_BOOT_BIN)
+
+
+
+###############################################################################
 # Qemu Running Command
+
 QEMU_RUN_CMD				:= $(QEMU_RUN_BIN) $(QEMU_RUN_ARGS)
 
 
 ifeq ($(QEMU_TERM_TYPE),tmux)
 QEMU_RUN_CMD				:= tmux new-session -s $(QEMU_TMUX_NAME) -d '$(QEMU_TMUX_OPTS) $(QEMU_RUN_CMD)' && sleep 1
 endif
-
-
-QEMU_RUN_DEPENDS			+= $(QEMU_TERMINAL)
-QEMU_RUN_DEPENDS			+= $(QEMU_BOOT_BIN)
 
 
 qemu_run : $(QEMU_RUN_DEPENDS)
